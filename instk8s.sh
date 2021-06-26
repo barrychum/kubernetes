@@ -12,9 +12,9 @@ sed -i -e "s/# en_HK.UTF-8 UTF-8/en_HK.UTF-8 UTF-8/g" /etc/locale.gen
 locale-gen
 
 # enable bridge netfilter
-modprobe br_netfilter
-echo 'net.bridge.bridge-nf-call-iptables = 1' > /etc/sysctl.d/20-bridge-nf.conf
-sysctl --system
+# modprobe br_netfilter
+# echo 'net.bridge.bridge-nf-call-iptables = 1' > /etc/sysctl.d/20-bridge-nf.conf
+# sysctl --system
 
 apt-get update
 apt-get install sudo -y
@@ -39,10 +39,11 @@ apt-get install -y kubelet kubeadm kubectl
 
 # kubeadm init --pod-network-cidr=10.244.0.0/16
 kubeadm init
-kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/master | awk 'FNR==2{print $1}') node-role.kubernetes.io/master-
 mkdir -p $HOME/.kube
 mkdir $HOME/.kube
 cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 
+kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/master | awk 'FNR==2{print $1}') node-role.kubernetes.io/master-
+
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
