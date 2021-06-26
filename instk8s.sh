@@ -37,8 +37,8 @@ echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' > /etc/apt/sources.
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
 
-# kubeadm init --pod-network-cidr=10.244.0.0/16
-kubeadm init
+kubeadm init --pod-network-cidr=10.244.0.0/16
+# kubeadm init  ## failed to start pods
 mkdir -p $HOME/.kube
 ## mkdir $HOME/.kube
 cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
