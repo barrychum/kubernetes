@@ -29,10 +29,10 @@ systemctl enable docker
 
 # install kubernetes
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
-### curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-### echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' > /etc/apt/sources.list.d/kubernetes.list
-curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' > /etc/apt/sources.list.d/kubernetes.list
+### curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+### echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
 
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
@@ -40,7 +40,7 @@ apt-get install -y kubelet kubeadm kubectl
 # kubeadm init --pod-network-cidr=10.244.0.0/16
 kubeadm init
 mkdir -p $HOME/.kube
-mkdir $HOME/.kube
+## mkdir $HOME/.kube
 cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 
 kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/master | awk 'FNR==2{print $1}') node-role.kubernetes.io/master-
