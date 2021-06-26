@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -e 
+
+swapoff -a
+sed -e '/swap/ s/^#*/#/' -i /etc/fstab
+
+# dpkg-reconfigure locales
+sed -i -e "s/# en_HK.UTF-8 UTF-8/en_HK.UTF-8 UTF-8/g" /etc/locale.gen
+locale-gen
+
+apt-get update
+apt-get install sudo -y
+apt-get install -y apt-transport-https ca-certificates curl gnupg2
+
+apt install docker.io -y
+# export LC_CTYPE=en_HK.UTF-8
+# export LC_ALL=en_HK.UTF-8
+systemctl start docker
+systemctl enable docker
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' > /etc/apt/sources.list.d/kubernetes.list
+apt-get update
+apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+
+# kubeadm init --pod-network-cidr=10.244.0.0/16
+kubeadm init
+kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/master | awk 'FNR==2{print $1}') node-role.kubernetes.io/master-
+mkdir -p $HOME/.kube
+cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+# kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
