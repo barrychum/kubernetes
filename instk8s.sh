@@ -94,3 +94,10 @@ rm $HOME/.kube/config
 EOF
 
 chmod +x $HOME/nodereset.sh
+
+# deploy metrics server with tls disabled on test server
+# https://github.com/kubernetes-sigs/metrics-server/
+ wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+ # vi components.yaml
+ # kubectl apply -f components.yaml
+
