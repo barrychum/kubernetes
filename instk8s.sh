@@ -20,7 +20,9 @@ apt-get update
 apt-get install sudo -y
 apt-get install -y apt-transport-https ca-certificates curl gnupg2
 
+
 # install docker (using recommended systemd driver)
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 mkdir /etc/docker;
 cat > /etc/docker/daemon.json <<EOF
 {
