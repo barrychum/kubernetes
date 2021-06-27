@@ -8,7 +8,7 @@ sed -e '/swap/ s/^#*/#/' -i /etc/fstab
 
 # install all en locales for docker just in case
 # dpkg-reconfigure locales
-sed -i -e "s/# en/en/g" /etc/locale.gen
+sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen
 locale-gen
 
 # enable bridge netfilter
