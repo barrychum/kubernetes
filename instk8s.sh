@@ -71,7 +71,8 @@ cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
 kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/kube-flannel.yml
-kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/kube-flannel-rbac.yml
+# kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/kube-flannel-rbac.yml
+kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 kubectl taint nodes --all node-role.kubernetes.io/master-
 EOF
 
@@ -97,7 +98,7 @@ chmod +x $HOME/nodereset.sh
 
 # deploy metrics server with tls disabled on test server
 # https://github.com/kubernetes-sigs/metrics-server/
- wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
- # vi components.yaml
- # kubectl apply -f components.yaml
+# wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+# vi components.yaml
+# kubectl apply -f components.yaml
 
