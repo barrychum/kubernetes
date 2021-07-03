@@ -55,6 +55,9 @@ echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' > /etc/apt/sources.
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
 
+# insall kubens tool
+apt-get install -y kubectx
+
 mkdir -p $HOME/.kube
 
 # kubeadm init  ## failed to start pods without pod-network param
@@ -65,14 +68,21 @@ cat > $HOME/nodeinit.sh <<EOF
 
 set -e
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
 kubeadm init --pod-network-cidr=10.244.0.0/16
-cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 
 # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel-rbac.yml
 kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/kube-flannel.yml
 # kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/kube-flannel-rbac.yml
-kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
+
+# install matrics server
+# https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+# kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 kubectl taint nodes --all node-role.kubernetes.io/master-
 EOF
 
@@ -92,6 +102,7 @@ set -e
 kubeadm reset
 rm /etc/cni/net.d/*
 rm $HOME/.kube/config
+rm -rf /root/.kube/cache
 EOF
 
 chmod +x $HOME/nodereset.sh
@@ -101,4 +112,5 @@ chmod +x $HOME/nodereset.sh
 # wget https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
 # vi components.yaml
 # kubectl apply -f components.yaml
+
 
