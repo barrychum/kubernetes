@@ -2,7 +2,7 @@ cat > $HOME/nodeinit.sh <<\EOF
 #!/bin/bash
 set -e
 kubeadm init --pod-network-cidr=10.244.0.0/16
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/kube-flannel.yml
