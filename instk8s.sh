@@ -70,8 +70,8 @@ set -e
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
 kubeadm init --pod-network-cidr=10.244.0.0/16
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+chown $(id -u):$(id -g) $HOME/.kube/config
 # cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 
 # kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
@@ -81,8 +81,10 @@ kubectl apply -f https://raw.githubusercontent.com/stellarhub/kubernetes/main/ku
 
 # install matrics server
 # https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
-# kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
+# kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
+### official metrics server wont work on test lab single node
+# deploy metrics server with tls disabled on test server
+kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 kubectl taint nodes --all node-role.kubernetes.io/master-
 EOF
 
@@ -92,13 +94,23 @@ EOF
 # echo 'kubectl taint nodes $(kubectl get nodes --selector=node-role.kubernetes.io/master | awk "FNR==2{print $1}") node-role.kubernetes.io/master-' >> $HOME/nodeinit.sh
 
 chmod +x $HOME/nodeinit.sh
-$HOME/nodeinit.sh
+## modified for worker node
+## $HOME/nodeinit.sh
 
 
 cat > $HOME/nodereset.sh <<EOF
 #!/bin/bash
 
 set -e
+
+# steps to remove a node
+# https://kubernetes.io/docs/tasks/administer-cluster/safely-drain-node/
+if [[ $(kubectl get nodes | grep $HOSTNAME | grep -L "master") ]]
+then
+kubectl drain $HOSTNAME --delete-emptydir-data --force --ignore-daemonsets
+fi
+
+
 kubeadm reset
 rm /etc/cni/net.d/*
 rm $HOME/.kube/config
@@ -113,4 +125,20 @@ chmod +x $HOME/nodereset.sh
 # vi components.yaml
 # kubectl apply -f components.yaml
 
+
+cat > $HOME/nodejoin.sh <<EOF
+#!/bin/bash
+echo "What is the master node IP "
+read masterip
+
+scp root@$masterip:/etc/kubernetes/admin.conf $HOME/.kube/config
+kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
+echo
+kubectl label node $HOSTNAME node-role.kubernetes.io/worker=worker
+kubectl get nodes
+
+echo
+EOF
+
+chmod +x $HOME/nodejoin.sh
 
