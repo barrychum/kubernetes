@@ -41,7 +41,7 @@ echo "What is the master node IP "
 read masterip
 
 echo "What is the master node password "
-read masterpass
+read -s masterpass
 clear -x
 
 sshpass -p $masterpass scp root@$masterip:/etc/kubernetes/admin.conf $HOME/.kube/config
