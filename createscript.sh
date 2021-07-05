@@ -17,19 +17,27 @@ chmod +x $HOME/nodeinit.sh
 
 cat > $HOME/nodereset.sh <<\EOF
 #!/bin/bash
-set -e
 
-kubeadm reset
+echo -n "Are you sure to delete this node (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
 
-if [[ $(kubectl get nodes | grep $HOSTNAME | grep -L "master") ]]
-then
-kubectl drain $HOSTNAME --delete-emptydir-data --force --ignore-daemonsets
-echo "This is a workder node.  This has been removed from cluster"
+    if [[ $(kubectl get nodes | grep $HOSTNAME | grep -L "master") ]] ; then
+        kubectl drain $HOSTNAME --delete-emptydir-data --force --ignore-daemonsets
+        echo "This is a workder node.  This has been removed from cluster"
+    fi
+
+    kubeadm reset --force
+
+    rm /etc/cni/net.d/*
+    rm $HOME/.kube/config
+    rm -rf /root/.kube/cache
+else
+    echo "Cancelled"
 fi
 
-rm /etc/cni/net.d/*
-rm $HOME/.kube/config
-rm -rf /root/.kube/cache
+
+
 EOF
 chmod +x $HOME/nodereset.sh
 
