@@ -21,6 +21,7 @@ set -e
 if [[ $(kubectl get nodes | grep $HOSTNAME | grep -L "master") ]]
 then
 kubectl drain $HOSTNAME --delete-emptydir-data --force --ignore-daemonsets
+echo "This is a workder node.  This has been removed from cluster"
 fi
 
 kubeadm reset
@@ -33,11 +34,16 @@ chmod +x $HOME/nodereset.sh
 
 cat > $HOME/nodejoin.sh <<\EOF
 #!/bin/bash
+clear -x
 echo "What is the master node IP "
 read masterip
 
-scp root@$masterip:/etc/kubernetes/admin.conf $HOME/.kube/config
-execcmd=$(ssh root@$masterip kubeadm token create --print-join-command --ttl=1m)
+echo "What is the master node password "
+read masterpass
+clear -x
+
+sshpass -p $masterpass scp root@$masterip:/etc/kubernetes/admin.conf $HOME/.kube/config
+execcmd=$(sshpass -p $masterpass ssh root@$masterip kubeadm token create --print-join-command --ttl=1m)
 $execcmd
 
 kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
