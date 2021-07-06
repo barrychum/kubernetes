@@ -1,0 +1,2 @@
+#!/bin/sh
+function podip() { awk '{printf "%-27s %-8s %-15s\n",$1,$3,$6}'; }
