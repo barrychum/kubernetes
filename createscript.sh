@@ -35,9 +35,6 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
 else
     echo "Cancelled"
 fi
-
-
-
 EOF
 chmod +x $HOME/nodereset.sh
 
