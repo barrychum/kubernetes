@@ -96,3 +96,19 @@ echo -e "\033[1mAll existing NodePort services\033[0m"
 kubectl get services | grep NodePort | awk '{print $1 "\t" $5}'
 EOF
 chmod +x $HOME/exposeNode.sh
+
+cat > $HOME/disableScheduling.sh <<\EOF
+#!/bin/sh
+hn=$(hostname)
+kubectl taint nodes $hn node-role.kubernetes.io/master=:NoSchedule
+EOF
+chmod +x $HOME/disableScheduling.sh
+
+cat > $HOME/enableScheduling.sh <<\EOF
+#!/bin/sh
+hn=$(hostname)
+# kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl taint nodes $hn node-role.kubernetes.io/master-
+EOF
+chmod +x $HOME/enableScheduling.sh
+
