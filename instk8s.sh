@@ -55,11 +55,15 @@ echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' > /etc/apt/sources.
 apt-get update
 apt-get install -y kubelet kubeadm kubectl
 
-# insall kubens tool
-apt-get install -y kubectx
-
 mkdir -p $HOME/.kube
 
 chmod +x createscript.sh
 
 ./createscript.sh
+
+# insall kubens tool
+# apt-get install -y kubectx
+cd /tmp
+git clone https://github.com/ahmetb/kubectx
+cp kubectx/kubectx /usr/local/bin/kubectx
+cp kubectx/kubens /usr/local/bin/kubens
