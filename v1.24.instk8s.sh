@@ -4,7 +4,12 @@
 swapoff -a
 sed -e '/swap/ s/^#*/#/' -i /etc/fstab
 
-##
+# install all en locales for docker just in case
+# dpkg-reconfigure locales
+sed -i -e "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g" /etc/locale.gen
+locale-gen
+
+## The followings are official kubernetes installation steps
 ## https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 ##
 
@@ -58,7 +63,8 @@ cat > /etc/docker/daemon.json <<EOF
 EOF
 sudo systemctl restart docker
 
-vi /etc/containerd/config.toml
+## default docker packaged disabled cri which is required for k8s
+sed -e '/disabled_plugins/ s/^#*/#/' -i /etc/containerd/config.toml
 sudo systemctl restart containerd
 
 ################
@@ -71,13 +77,14 @@ sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://pack
 echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt-get update
-sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt-get install -y kubelet=1.24.1-00 kubeadm=1.24.1-00 kubectl=1.24.1-00
 sudo apt-mark hold kubelet kubeadm kubectl
 
 ##
 ## https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 ## 
 
+## Official kubernetes installation steps ends here
 ######
 
 mkdir -p $HOME/.kube
