@@ -15,7 +15,7 @@ then
 #  curl https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml -O
 #  kubectl create -f custom-calico.yaml
 
-cat <<\EOF | kubectl create -f -
+cat <<\EOS | kubectl create -f -
 apiVersion: operator.tigera.io/v1
 kind: Installation
 metadata:
@@ -34,7 +34,7 @@ kind: APIServer
 metadata:
   name: default
 spec: {}
-EOF
+EOS
 
 else
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/kube-flannel.yml
