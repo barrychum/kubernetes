@@ -48,26 +48,26 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 EOF
 chmod +x $HOME/nodeinit.sh
 
-cat > $HOME/custom-calico.yaml <<\EOF
-apiVersion: operator.tigera.io/v1
-kind: Installation
-metadata:
-  name: default
-spec:
-  calicoNetwork:
-    ipPools:
-    - blockSize: 26
-      cidr: 10.244.0.0/16
-      encapsulation: VXLANCrossSubnet
-      natOutgoing: Enabled
-      nodeSelector: all()
----
-apiVersion: operator.tigera.io/v1
-kind: APIServer
-metadata:
-  name: default
-spec: {}
-EOF
+# cat > $HOME/custom-calico.yaml <<\EOF
+# apiVersion: operator.tigera.io/v1
+# kind: Installation
+# metadata:
+#   name: default
+# spec:
+#   calicoNetwork:
+#     ipPools:
+#     - blockSize: 26
+#       cidr: 10.244.0.0/16
+#       encapsulation: VXLANCrossSubnet
+#       natOutgoing: Enabled
+#       nodeSelector: all()
+# ---
+# apiVersion: operator.tigera.io/v1
+# kind: APIServer
+# metadata:
+#   name: default
+# spec: {}
+# EOF
 
 cat > $HOME/nodereset.sh <<\EOF
 #!/bin/bash
