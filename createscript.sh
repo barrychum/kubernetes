@@ -13,7 +13,29 @@ if [[ $cni = [Cc] ]]
 then
   kubectl create -f https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
 #  curl https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml -O
-  kubectl create -f custom-calico.yaml
+#  kubectl create -f custom-calico.yaml
+
+cat <<\EOF | kubectl create -f -
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  calicoNetwork:
+    ipPools:
+    - blockSize: 26
+      cidr: 10.244.0.0/16
+      encapsulation: VXLANCrossSubnet
+      natOutgoing: Enabled
+      nodeSelector: all()
+---
+apiVersion: operator.tigera.io/v1
+kind: APIServer
+metadata:
+  name: default
+spec: {}
+EOF
+
 else
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/kube-flannel.yml
 
@@ -165,3 +187,36 @@ kubectl apply -f daemon-set/nginx-ingress.yaml
 kubectl get pods --namespace=nginx-ingress
 EOF
 chmod +x $HOME/instingress.sh
+
+
+cat > $HOME/instmetallb.sh <<\EOF
+
+# https://opensource.com/article/20/7/homelab-metallb
+# https://metallb.universe.tf/installation/
+
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
+
+kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+
+# https://metallb.universe.tf/configuration/
+#      - 192.168.38.128/25
+
+cat <<EOS | kubectl create -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: address-pool-1
+      protocol: layer2
+      addresses:
+      - 192.168.38.60-192.168.38.65
+EOS
+
+EOF
+chmod +x $HOME/instmetallb.sh
+
