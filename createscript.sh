@@ -1,19 +1,51 @@
 cat > $HOME/nodeinit.sh <<\EOF
 #!/bin/bash
 set -e
+
+echo "Calico or Flannel"
+read cni
+
 kubeadm init --pod-network-cidr=10.244.0.0/16
 cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
-kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/kube-flannel.yml
+if [[ $cni = [Cc] ]]
+then
+  kubectl create -f https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
+#  curl https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml -O
+  kubectl create -f custom-calico.yaml
+else
+  kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/kube-flannel.yml
 
 # https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
 # kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.5.0/components.yaml
-kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
+  kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
+fi
+
 kubectl taint nodes --all node-role.kubernetes.io/master-
 EOF
 chmod +x $HOME/nodeinit.sh
 
+cat > $HOME/custom-calico.yaml <<\EOF
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  calicoNetwork:
+    ipPools:
+    - blockSize: 26
+      cidr: 10.244.0.0/16
+      encapsulation: VXLANCrossSubnet
+      natOutgoing: Enabled
+      nodeSelector: all()
+---
+apiVersion: operator.tigera.io/v1
+kind: APIServer
+metadata:
+  name: default
+spec: {}
+EOF
 
 cat > $HOME/nodereset.sh <<\EOF
 #!/bin/bash

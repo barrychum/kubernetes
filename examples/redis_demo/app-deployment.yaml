@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+  labels:
+    app: demo
+spec:
+  selector:
+    matchLabels:
+      app: demo
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: demo
+        tier: frontend
+    spec:
+      containers:
+      - image: stellarhub/appbuild:validation
+        name: demo
+        env:
+        - name: MYSQL_HOST
+          value: db
+        - name: REDIS_HOST
+          value: redis
+        ports:
+        - containerPort: 80
+          name: demo
+
