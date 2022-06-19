@@ -220,3 +220,17 @@ EOS
 EOF
 chmod +x $HOME/instmetallb.sh
 
+
+
+cat > $HOME/instingress.sh <<\EOF
+#!/bin/sh
+# https://kubernetes.github.io/ingress-nginx/deploy/
+
+# The following works with MetalLB
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml
+
+# The following works with bare metal NodePort.  Refer to https://kubernetes.github.io/ingress-nginx/deploy/#bare-metal-clusters
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/baremetal/deploy.yaml
+
+EOF
+chmod +x $HOME/instingress.sh
