@@ -234,3 +234,45 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 
 EOF
 chmod +x $HOME/instingress.sh
+
+
+cat > $HOME/instdashboard.sh <<\EOF
+#!/bin/sh
+# https://kubernetes.github.io/ingress-nginx/deploy/
+
+# https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.5.0/aio/deploy/recommended.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/aio/deploy/recommended.yaml
+
+# kubectl --namespace kubernetes-dashboard patch svc kubernetes-dashboard -p '{"spec": {"type": "NodePort"}}'
+kubectl --namespace kubernetes-dashboard patch svc kubernetes-dashboard -p '{"spec": {"type": "LoadBalancer"}}'
+
+cat <<EOS | kubectl create -f -
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOS
+
+cat <<EOS | kubectl create -f -
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+EOS
+
+kubectl -n kubernetes-dashboard create token admin-user > dashboard-token.txt
+echo dashboard-token.txt
+
+EOF
+chmod +x $HOME/instdashboard.sh
+
