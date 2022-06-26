@@ -54,7 +54,7 @@ else
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 fi
 
-printf "\n\n${reverse}Since k8s v1.24, if you want to schedule on the control plan node\n"
+printf "\n\n${reverse}Since k8s v1.24, if you want to schedule on the control plane node\n"
 printf "you need to untaint control-plane\n"
 printf "Otherwise, please add a worker node${normal}\n"
 # kubectl taint nodes --all node-role.kubernetes.io/master-
