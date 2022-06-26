@@ -10,14 +10,16 @@ normal=$(tput sgr0)
 echo "Calico or Flannel"
 read cni
 
-printf "\n\n${reverse}Creating cluster${normal}\n"
-
+printf "\n\n${reverse}Creating cluster...${normal}\n"
 kubeadm init --pod-network-cidr=10.244.0.0/16
+
+printf "\n\n${reverse}Cluster created.  Copying kubeconfig...${normal}\n"
 cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
 chown $(id -u):$(id -g) $HOME/.kube/config
 
 if [[ $cni = [Cc] ]]
 then
+  printf "\n\n${reverse}Creating Calico CNI...${normal}\n"
   kubectl create -f https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
 #  curl https://projectcalico.docs.tigera.io/manifests/custom-resources.yaml -O
 #  kubectl create -f custom-calico.yaml
@@ -44,6 +46,7 @@ spec: {}
 EOS
 
 else
+  printf "\n\n${reverse}Creating Flannel CNI...${normal}\n"
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/kube-flannel.yml
 
 # https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
@@ -51,7 +54,10 @@ else
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 fi
 
+printf "\n\n${reverse}taint all nodes (including master)...${normal}\n"
 kubectl taint nodes --all node-role.kubernetes.io/master-
+
+printf "\n\n${reverse}Cluster created with 1 master node${normal}\n"
 EOF
 chmod +x $HOME/nodeinit.sh
 
