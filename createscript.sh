@@ -54,10 +54,10 @@ else
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 fi
 
-printf "\n\n${reverse}Since k8s v1.24, master role is removed\n"
-printf "untaint role control-plane to schedule pods\n"
-printf "Otherwise, please add a worker node${normal}\n"
-# kubectl taint nodes --all node-role.kubernetes.io/master-
+printf "\n\n${reverse}untaint nodes with role control-plane and master\n"
+printf "for pod scheduling${normal}\n"
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+kubectl taint nodes --all node-role.kubernetes.io/master-
 
 printf "\n\n${reverse}Cluster created with 1 master node${normal}\n\n"
 EOF
