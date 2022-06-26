@@ -2,8 +2,15 @@ cat > $HOME/nodeinit.sh <<\EOF
 #!/bin/bash
 set -e
 
+bold=$(tput bold)
+underline=$(tput smul)
+reverse=$(tput rev)
+normal=$(tput sgr0)
+
 echo "Calico or Flannel"
 read cni
+
+printf "\n\n${reverse}Creating cluster${normal}\n"
 
 kubeadm init --pod-network-cidr=10.244.0.0/16
 cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
