@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## disable swap for kubelet requirement (swap is alpha support after v1.22)
+## disable swap for kubelet requirement (swap is in alpha support after v1.22)
 swapoff -a
 sed -e '/swap/ s/^#*/#/' -i /etc/fstab
 
@@ -77,6 +77,20 @@ sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://pack
 echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 sudo apt-get update
+
+apt list -a kubectl | grep kubectl | tac
+
+latest=$(apt list -a kubectl | grep kubectl | tac | tail -n1 | awk '{printf "%s",$2}')
+
+echo "Enter the version to install, or press enter to install \"$latest\""
+read verinst
+
+if [ -z "$verinst"]
+then
+    verinst=$latest
+fi
+echo "Installing version $verinst"
+
 sudo apt-get install -y kubelet=1.24.1-00 kubeadm=1.24.1-00 kubectl=1.24.1-00
 sudo apt-mark hold kubelet kubeadm kubectl
 
