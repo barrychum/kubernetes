@@ -80,7 +80,7 @@ sudo apt-get update
 
 apt list -a kubectl | grep kubectl | tac
 
-latest=$(apt list -a kubectl | grep kubectl | tac | tail -n1 | awk '{printf "%s",$2}')
+latest=$(apt list -a kubectl  2>/dev/null | grep kubectl | tac | tail -n1 | awk '{printf "%s",$2}')
 
 echo "Enter the version to install, or press enter to install \"$latest\""
 read verinst
@@ -91,7 +91,8 @@ then
 fi
 echo "Installing version $verinst"
 
-sudo apt-get install -y kubelet=1.24.1-00 kubeadm=1.24.1-00 kubectl=1.24.1-00
+## sudo apt-get install -y kubelet=1.24.1-00 kubeadm=1.24.1-00 kubectl=1.24.1-00
+sudo apt-get install -y kubelet=$verinst kubeadm=$verinst kubectl=$verinst
 sudo apt-mark hold kubelet kubeadm kubectl
 
 ##
