@@ -1,6 +1,8 @@
 apt install -y golang
 
+cd /tmp
+rm -rf etcd
 git clone -b v3.4.0 http://github.com/etcd-io/etcd.git 
-cd etcd/
-./build.sh
+cd etcd
+./build
 cp bin/* /usr/local/bin
