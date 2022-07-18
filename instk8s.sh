@@ -1,5 +1,7 @@
 #!/bin/bash
 
+apt update && apt install -y sudo
+
 ## disable swap for kubelet requirement (swap is in alpha support after v1.22)
 swapoff -a
 sed -e '/swap/ s/^#*/#/' -i /etc/fstab
