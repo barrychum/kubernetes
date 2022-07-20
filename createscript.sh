@@ -54,10 +54,18 @@ else
   kubectl apply -f https://raw.githubusercontent.com/barrychum/kubernetes/main/components.yaml
 fi
 
-printf "\n\n${reverse}untaint nodes with role control-plane and master\n"
-printf "for pod scheduling${normal}\n"
-kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-kubectl taint nodes --all node-role.kubernetes.io/master-
+echo "Untaint control-plane? (U)ntaint or (K)eep"
+read taint
+if [[ $taint = [Uu] ]]
+then
+  printf "\n\n${reverse}untaint nodes with role control-plane and master\n"
+  printf "for pod scheduling${normal}\n"
+  kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+  kubectl taint nodes --all node-role.kubernetes.io/master-
+  printf "\n\n${reverse}Master node is untainted${normal}\n\n"
+else
+  printf "\n\n${reverse}Master node is NoSchedule${normal}\n\n"
+fi
 
 printf "\n\n${reverse}Cluster created with 1 master node${normal}\n\n"
 EOF
